@@ -195,6 +195,10 @@ There are many software tools available for generating conceptual models, I like
 
 ![](img/cmseri.png)
 
+# expansion on one of theh 'boxes'
+
+![](img/RHESSys.png)
+
 ## Conceptual Models: Things to think about {.scrollable}
 
 -   What inputs/parameters will influence how a process/mechanism leads to the outputs you are interested in
@@ -209,15 +213,6 @@ There are many software tools available for generating conceptual models, I like
 
 -   What are some key assumptions?
 
-# Develop a Conceptual Model
-
--   Form groups of 3
--   With your group, come up with a modeling goal
--   Decide if the goal is understanding,prediction or communication
--   Brainstorm on important
-    -   inputs, parameters and outputs
-    -   relationships/processes
-    -   assumptions
 
 # Types of Model
 
@@ -295,4 +290,15 @@ Think...simple bucket model
 
 # Assignment 2 - Due Jan 13th 8am
 
-[Assignment 2](%22../assignments/Assignment2_ConceptualModel.html%22)
+
+[Assignment 2](../assignments/Assignment2_ConceptualModel.html)
+
+# Develop a Conceptual Model
+
+-   Form groups of 3
+-   With your group, come up with a modeling goal
+-   Decide if the goal is understanding,prediction or communication
+-   Brainstorm on important
+    -   inputs, parameters and outputs
+    -   relationships/processes
+    -   assumptions
