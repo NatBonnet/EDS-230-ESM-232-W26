@@ -81,9 +81,9 @@ This is a
 
 How would we expand it to make it
 
--   dynamic?
--   spatially distributed?
--   stochastic?
+-   dynamic? Incorporate stream flow into reservoir (depends on time forcing), height depends on flow out of reservoir, different flow might depend on energy need
+-   spatially distributed? including more area, more reservoirs or more of watershed
+-   stochastic? estimate probability of power production based on probability distribution of water levels
 
 # Related Types of models: Example
 
@@ -143,7 +143,9 @@ Can you use it to answer your question - can you change inputs/parameters that r
 
 Lets consider an example questions
 
-**Example Q1**: Will a forest fire in the upper 1/2 of a watershed impact streamflow more than a similarly sized fire lower (nearer the stream) in the watershed?
+**Example Q1**: Will a forest fire in the upper 1/2 of a watershed impact stream flow more than a similarly sized fire lower (nearer the stream) in the watershed?
+
+this would need to be a spatial model and estimate how fire could possibly affect stream flow (ex: trees and plants intercept and absorb water- need to represent the relationship between vegetation and water use)
 
 Why might you need a physically based model rather than a statistical model?
 
@@ -379,7 +381,6 @@ We will plot to check that the input data makes sense
 ```{r datacheck}
 
 
-
 # already in the format required for the model
 head(sierraczosolar)
 
@@ -405,11 +406,11 @@ ggplot(sierraczosolar, aes(x = month, y = (Kdown_direct+Kdown_diffuse), fill=mon
 ```{r, eval=TRUE, echo=TRUE}
 # run the model
 solarpv(area = 0.1, solar = sierraczosolar, 
-        clr = "green", eunit = "W", g=FALSE)
+        clr = "green", eunit = "W", g=TRUE)
 
 # run and save results - but don't plot
 site1 <- solarpv(area = 0.1, solar = sierraczosolar, 
-            clr = "green", eunit = "W", g = FALSE)
+            clr = "green", eunit = "W", g = TRUE)
 site1$mean
 site1$annual
 ```

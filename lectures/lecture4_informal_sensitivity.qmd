@@ -19,8 +19,6 @@ library(ggpubr)
 library(here)
 ```
 
-
-
 ## What we are learning so far {.scrollable}
 
 How to find the "right" tool for the job
@@ -35,7 +33,7 @@ How to find the "right" tool for the job
 
     -   some parameters impact model transfer function, other I/O formatting
 
-# Answer to visual check 
+# Answer to visual check
 
 # My code to find issue and clean data {.scrollable}
 
@@ -66,7 +64,7 @@ sierraczosolar <- sierraczosolar %>%
 # now run the model again
 site1 <- solarpv(area = 0.1, 
           solar = sierraczosolar, clr = "green", eunit = "kW", g = TRUE)
-
+site1
 # keep cleaned up data set for future use
 save(sierraczosolar, file=here("Data/sierraczosolar_clean.rda"))
 
@@ -91,7 +89,7 @@ site1 <- solarpv(area = 0.1, solar = sierraczosolar)
 
 ## Playing with models {.scrollable}
 
-::: {.concept-box}
+::: concept-box
 We often build models to try different options
 
 **Model inputs**: solar radiation (daily direct and diffuse)
@@ -103,7 +101,7 @@ We often build models to try different options
 
 How would a lower efficiency impact mean power generated?
 
-*eff* – 0.6 instead of default 0.8  
+*eff* – 0.6 instead of default 0.8
 
 try it
 
@@ -125,12 +123,11 @@ site2$mean
 # relative difference in parameter
 (0.6-0.8)/0.8 * 100
 ```
-
+You're often interested in looking at how did the output change relative to the change in the input. Here it is super proportional.
 
 ## Informal Sensitivity Analysis {.scrollable}
 
-What happens when we vary parameters?
-  * Not always obvious when transfer function is non-linear or multi-part
+What happens when we vary parameters? \* Not always obvious when transfer function is non-linear or multi-part
 
 **Informal** - just try varying parameters
 
@@ -186,7 +183,6 @@ library(tidyverse)
 # first come up with varying values for efficiency 
 # if we don't know efficiency exactly , lets try 20 samples
 
-
 eff <- rnorm(mean = 0.6, sd = 0.1, n = 20)
 
 # use map from purrr to run model for all values of eff
@@ -208,13 +204,13 @@ head(site2)
 -   R often returns lists - but not so easy for organization
 
 -   ask yourself what you want to do with the data, then put in a structure that will make this easy
-  -  a data frame is often the best structure for graphing
+
+-   a data frame is often the best structure for graphing
 
 -   e.g two different data frames
 
     -   plot variation in mean annual electricity by *eff*
     -   plot variation in each year due to variation in *eff*
-   
 
 ```{r sen1b, eval=T}
 
@@ -249,7 +245,6 @@ WHY: If you want the one number that is the "best guess" given uncertainty
 
 ```{r sen2, eval=T, echo=TRUE}
 
-
 # now we could plot
 ggplot(site2df, aes(year, elect, group = year)) +
   geom_boxplot() +
@@ -260,9 +255,9 @@ ggplot(site2df, aes(year, elect, group = year)) +
 
 **Why?**
 
-- Summarizes parameter uncertainty  
-- Highlights interannual trends  
-- Easier comparison across years
+-   Summarizes parameter uncertainty\
+-   Highlights interannual trends\
+-   Easier comparison across years
 
 ## Plot {.scrollable}
 
@@ -334,3 +329,24 @@ Sensitivity is more general - and the first step in uncertainty analysis, but al
 Learn to "play" with models
 
 # Assignment 3
+
+
+```{r}
+uncertainty <- rnorm(mean = 10000, sd = 1500, n = 100)
+
+# use map from purrr to run model for all values of eff
+# notice how map adds the one parameter that is missing from the input list
+
+site2 <- uncertainty %>% map(~ solarpv(area = 0.1, 
+  solar = sierraczosolar, g = FALSE, etype = "direct", ethresh = .x))
+
+tmp <- map_dfr(site2, `[`, c("annual"))
+
+# convert from tibble to a data frame
+site2df <- data.frame(year = tmp$annual$year, elect = tmp$annual$elect)
+
+ggplot(site2df, aes(year, elect, group = year)) +
+  geom_boxplot()
+
+```
+
