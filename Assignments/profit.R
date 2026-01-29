@@ -23,14 +23,14 @@ profit <- function(clim, year, price = 4000, cost = 3000){
       # Filter for February and the desired year
       filter(month == 2, year == harvest_year) %>%  
       # Find lowest Feb temp
-      summarize(tmin = min(tmin_c))
+      summarize(tmin = mean(tmin_c, na.rm = TRUE))
     
     # Find the total precipitation from Jan in a given year
     precip <- clim %>% 
       # Filter for January and desired year
       filter(month == 1, year == harvest_year) %>% 
       # Get total rainfall value (mm)
-      summarize(precip_sum = sum(precip))
+      summarize(precip_sum = sum(precip, na.rm = TRUE))
     
     # Apply equation from Lobell et. al 2006
     yield <- -0.015*min_temps$tmin -0.0046*(min_temps$tmin)**2 - 
@@ -43,7 +43,7 @@ profit <- function(clim, year, price = 4000, cost = 3000){
   yield <- almond_yield(clim = clim, harvest_year = year)
   
   # Return a value to estimate inflation costs
-  inflation <- 1 + ((year - 1989) * 0.02)
+  inflation <- 1 + ((year - 1988) * 0.02)
   
   # Calculate raw profit from yield with a given base price factoring in inflation
   revenue <- yield * price * inflation
@@ -72,7 +72,7 @@ clim <- read.table(here("Assignments", "clim.txt"), header = TRUE)
 profit(clim = clim, year = 2000)
 
 # Pull out entire period of interest
-years <- seq(clim$year[[2]], max(clim$year), by = 1)
+years <- seq(min(clim$year), max(clim$year), by = 1)
 
 # Generate possible values for price variation by year
 price_var <- rnorm(10, mean = 4000, sd = 50)
@@ -85,6 +85,7 @@ profit_profile <- expand_grid(year = years, price = price_var, cost = cost_var) 
   mutate(profit = pmap_dbl(list(year = year, price = price, cost = cost), 
                            ~profit(clim = clim, ...)))
 
+# Produce plot of sensitivity analysis
 ggplot(data = profit_profile, aes(x = factor(year), y = profit)) +
   geom_boxplot(color = "darkblue", outliers = FALSE)+
   scale_y_continuous(labels = scales::label_dollar())+
@@ -92,5 +93,5 @@ ggplot(data = profit_profile, aes(x = factor(year), y = profit)) +
   theme(axis.title.x = element_blank(), 
         axis.text.x = element_text(angle = 70))+
   labs(title = "California Almond Profit Over Time", subtitle = "adjusted for base yield variance",
-       y = "Profit Value (USD/ton)")
+       y = "Profit Value (USD/acre)")
 

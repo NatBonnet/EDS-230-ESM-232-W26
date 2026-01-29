@@ -1,0 +1,79 @@
+---
+title: "EDS 230: Assignment 4- Almond Profit Based on Yield Anomaly"
+author: "Nathalie Bonnet and Kylie Newcomer"
+date: 2026-01-28
+format: html
+warning: FALSE
+message: FALSE
+---
+
+# Summary
+
+In this assignment, we applied the previously completed almond yield anomaly function to estimate potential profits from almond farming in California. This calculation was done based off the almond crop yield equation in Lobell et. al 2006. Here we create a nested function to calculate expected almond yield and apply it to a basic profit model. Then, we conducted an informal sensitivity analysis with conservative price and cost variation (10%) to understand how the model performs across time and variation in precipitation + temperature.
+
+# Implementation
+
+## Setup
+
+```{r}
+# Read in libraries for informal sensitivity analysis
+library(tidyverse)
+library(here)
+
+# Source the profit function from it's script
+source(here("Assignments", "profit.R"))
+
+# Read in data frame of interest
+clim <- read.table(here("Assignments", "clim.txt"), header = TRUE)
+```
+
+## Apply function across all years with a normal sampling distribution in 2 parameters
+
+```{r}
+# Test profit for one year
+profit(clim = clim, year = 2000)
+
+# Pull out entire period of interest
+years <- seq(min(clim$year), max(clim$year), by = 1)
+
+# Generate possible values for 10% price variation by year
+price_var <- rnorm(10, mean = 4000, sd = 400)
+
+# Generate possible values for 10% cost variation by year
+cost_var <- rnorm(10, mean = 3000, sd = 300)
+
+# Apply profit function across all years of interest in climate data
+profit_profile <- expand_grid(year = years, price = price_var, cost = cost_var) %>% 
+  mutate(profit = pmap_dbl(list(year = year, price = price, cost = cost), 
+                           ~profit(clim = clim, ...)))
+```
+
+## Visualize
+
+```{r}
+# Produce plot of sensitivity analysis with 10% cost and price margins
+ggplot(data = profit_profile, aes(x = factor(year), y = profit)) +
+  geom_boxplot(color = "darkblue", outliers = FALSE)+
+  scale_y_continuous(labels = scales::label_dollar())+
+  theme_minimal() +
+  theme(axis.title.x = element_blank(), 
+        axis.text.x = element_text(angle = 70))+
+  labs(title = "California Almond Profit Over Time", subtitle = "adjusted 10% profit variation",
+       y = "Profit Value (USD/acre)")
+
+```
+
+Here we see that due to high precipitation in 1995, the profit for that year is extremely inflated. The equation used for yield anomaly is limited because it exponentially increases based on total precipitation in January. However, this results in unrealistic predictions for profit margins. This really only occurs in rainy years however, removing inflated values we see a much more realistic picture of potential profits. 
+
+```{r}
+# Example if removing years with inflated precipitation
+ggplot(data = profit_profile, aes(x = factor(year), y = profit)) +
+  geom_boxplot(color = "darkblue", outliers = FALSE)+
+  scale_y_continuous(labels = scales::label_dollar(), 
+                     limits = c(-50, 100000))+
+  theme_minimal() +
+  theme(axis.title.x = element_blank(), 
+        axis.text.x = element_text(angle = 70))+
+  labs(title = "California Almond Profit Over Time", subtitle = "adjusted for 10% profit variation",
+       y = "Profit Value (USD/acre)")
+```
