@@ -171,14 +171,14 @@ set.seed(1)
 
 # which parameters are we going to vary - make a vector of all the names
 
-
+pnames = c("Tcoeff1", "Tmincoeff2", "Pcoeff1", "Pcoeff2", "intercep")
 # how many parameters
-
+npar = length(pnames)
 # how many samples
-
+parm_quant = randomLHS(pnames, npar)
 
 # create our latin hyper cube of quantiles for each parameter
-
+parm = as.data.frame(matrix(nrow = nrow(parm_quant), ncol = ncol(parm_quant)))
 # add column names to our quantile matrix
 
 

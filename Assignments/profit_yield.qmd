@@ -1,0 +1,6 @@
+---
+title: "profit_yield"
+format: html
+---
+
+- input baseline yield as parameter
